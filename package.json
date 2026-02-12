@@ -6,7 +6,7 @@
     "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
-    "build": "npm run build --prefix client",
+    "build": "cd client && npm install && npm run build",
     "start": "npm run start --prefix server",
     "postinstall": "npm install --prefix server && npm install --prefix client",
     "test": "echo \"No tests configured\" && exit 0"
