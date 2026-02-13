@@ -453,7 +453,17 @@ app.post('/api/admin/team/remove', (req, res) => {
     return res.status(400).json({ error: 'teamId is required' })
   }
   try {
-    db.prepare('DELETE FROM teams WHERE id = ?').run(teamId)
+    const tx = db.transaction(() => {
+      // Remove any bids associated with this team first to avoid
+      // foreign key issues and keep historical data consistent.
+      db.prepare('DELETE FROM bids WHERE teamId = ?').run(teamId)
+
+      // Now remove the team itself.
+      db.prepare('DELETE FROM teams WHERE id = ?').run(teamId)
+    })
+
+    tx()
+
     logEvent('team_remove', { teamId })
     broadcastAll()
     res.json({ ok: true })
