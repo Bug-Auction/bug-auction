@@ -65,6 +65,19 @@ export default function AdminPage() {
     }
   }
 
+  async function refreshTeams() {
+    try {
+      const res = await fetch('/api/admin/teams')
+      if (!res.ok) return
+      const data = await res.json().catch(() => null)
+      if (data && Array.isArray(data.teams)) {
+        setState((prev) => ({ ...prev, teams: data.teams }))
+      }
+    } catch {
+      // ignore refresh errors; socket updates still apply
+    }
+  }
+
   async function call(path, body) {
     setError('')
     setInfo('')
@@ -365,13 +378,19 @@ export default function AdminPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => {
+                      onClick={async () => {
                         if (
                           window.confirm(
                             `Remove team ${t.name}? This cannot be undone.`
                           )
                         ) {
-                          call('/api/admin/team/remove', { teamId: t.id })
+                          try {
+                            const teamId = Number(t.id)
+                            await call('/api/admin/team/remove', { teamId })
+                            await refreshTeams()
+                          } catch {
+                            // errors already handled in call()
+                          }
                         }
                       }}
                       className="px-2 py-1 rounded bg-red-600/80 text-[11px]"

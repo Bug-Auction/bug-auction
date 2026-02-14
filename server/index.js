@@ -449,17 +449,39 @@ app.post('/api/admin/team/remove', (req, res) => {
   if (password !== undefined && password !== ADMIN_PASSWORD) {
     return res.status(401).json({ error: 'Unauthorized' })
   }
-  if (!teamId) {
+  if (teamId === undefined || teamId === null || teamId === '') {
     return res.status(400).json({ error: 'teamId is required' })
   }
+
+  const numericId = Number(teamId)
+  if (!Number.isFinite(numericId)) {
+    return res.status(400).json({ error: 'Invalid teamId' })
+  }
+
   try {
-    db.prepare('DELETE FROM teams WHERE id = ?').run(teamId)
-    logEvent('team_remove', { teamId })
+    const stmt = db.prepare('DELETE FROM teams WHERE id = ?')
+    const result = stmt.run(numericId)
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Team not found' })
+    }
+
+    logEvent('team_remove', { teamId: numericId })
     broadcastAll()
     res.json({ ok: true })
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Failed to remove team' })
+  }
+})
+
+app.get('/api/admin/teams', (req, res) => {
+  try {
+    const { teams } = getCurrentState()
+    res.json({ teams })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Failed to fetch teams' })
   }
 })
 

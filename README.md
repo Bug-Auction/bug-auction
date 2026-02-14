@@ -7,7 +7,7 @@ Full‑stack real‑time auction app for a technical fest, with a mobile‑first
 - **Frontend**: React, Vite, TailwindCSS, React Router, Socket.io client
 - **Backend**: Node.js, Express, Socket.io, SQLite (better‑sqlite3)
 - **Storage**: SQLite file (`server/bug-auction.db`)
-- **Deploy**: Railway / Render (Node service, static client build)
+- **Deploy**: Render (Node service, static client build)
 
 ### Core Rules Implemented
 

@@ -14,9 +14,13 @@ function formatCurrency(value) {
 
 export default function TeamPage() {
   const [teamName, setTeamName] = useState('')
-  const [token, setToken] = useState(
-    () => window.localStorage.getItem('bugAuctionToken') || ''
-  )
+  const [token, setToken] = useState(() => {
+    try {
+      return window.sessionStorage.getItem('bugAuctionToken') || ''
+    } catch {
+      return ''
+    }
+  })
   const [joined, setJoined] = useState(false)
   const [joining, setJoining] = useState(false)
   const [status, setStatus] = useState('')
@@ -24,7 +28,7 @@ export default function TeamPage() {
   const [cooldown, setCooldown] = useState(false)
 
   const [state, setState] = useState({
-    wallet: 16000,
+    wallet: 10000,
     currentBid: 0,
     highestBid: 0,
     rank: null,
@@ -59,7 +63,11 @@ export default function TeamPage() {
       setState((prev) => ({ ...prev, ...payload }))
       if (payload.token && payload.token !== token) {
         setToken(payload.token)
-        window.localStorage.setItem('bugAuctionToken', payload.token)
+        try {
+          window.sessionStorage.setItem('bugAuctionToken', payload.token)
+        } catch {
+          // ignore storage errors
+        }
       }
     }
 
@@ -117,7 +125,11 @@ export default function TeamPage() {
       const data = await res.json()
       if (data.token) {
         setToken(data.token)
-        window.localStorage.setItem('bugAuctionToken', data.token)
+        try {
+          window.sessionStorage.setItem('bugAuctionToken', data.token)
+        } catch {
+          // ignore storage errors
+        }
       }
       setJoined(true)
       setState((prev) => ({ ...prev, ...data.state }))
