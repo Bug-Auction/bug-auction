@@ -452,21 +452,19 @@ app.post('/api/admin/team/remove', (req, res) => {
   if (teamId === undefined || teamId === null || teamId === '') {
     return res.status(400).json({ error: 'teamId is required' })
   }
-
-  const numericId = Number(teamId)
-  if (!Number.isFinite(numericId)) {
-    return res.status(400).json({ error: 'Invalid teamId' })
-  }
-
   try {
-    const stmt = db.prepare('DELETE FROM teams WHERE id = ?')
-    const result = stmt.run(numericId)
+    const tx = db.transaction(() => {
+      // Remove any bids associated with this team first to avoid
+      // foreign key issues and keep historical data consistent.
+      db.prepare('DELETE FROM bids WHERE teamId = ?').run(teamId)
 
-    if (result.changes === 0) {
-      return res.status(404).json({ error: 'Team not found' })
-    }
+      // Now remove the team itself.
+      db.prepare('DELETE FROM teams WHERE id = ?').run(teamId)
+    })
 
-    logEvent('team_remove', { teamId: numericId })
+    tx()
+
+    logEvent('team_remove', { teamId })
     broadcastAll()
     res.json({ ok: true })
   } catch (err) {
