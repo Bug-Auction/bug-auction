@@ -10,7 +10,7 @@ const { db, logEvent } = require('./db')
 
 const PORT = process.env.PORT || 4000
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'bugauction'
-const START_WALLET = 16000
+const START_WALLET = 12000
 const START_BID = 400
 const INCREMENT = 200
 const MAX_BID = 2000

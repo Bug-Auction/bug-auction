@@ -11,7 +11,7 @@ Full‑stack real‑time auction app for a technical fest, with a mobile‑first
 
 ### Core Rules Implemented
 
-- **Team wallet**: starts at `16000` and carries across rounds
+- **Team wallet**: starts at `12000` and carries across rounds
 - **Starting bid**: `400`, **increment**: `+200`, **max bid per round**: `2000`
 - **One active round at a time**
 - **Server‑side only** bid calculations with `Date.now()` timestamps and DB storage
