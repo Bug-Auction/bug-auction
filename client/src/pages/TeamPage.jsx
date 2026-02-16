@@ -28,7 +28,7 @@ export default function TeamPage() {
   const [cooldown, setCooldown] = useState(false)
 
   const [state, setState] = useState({
-    wallet: 16000,
+    wallet: 12000,
     currentBid: 0,
     highestBid: 0,
     rank: null,
