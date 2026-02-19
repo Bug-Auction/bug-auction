@@ -106,6 +106,14 @@ function broadcastAll() {
     teams,
     highestBid
   })
+
+  // Team states - emit to each team's room
+  for (const team of teams) {
+    const teamState = teamStateFor(team)
+    io.to(`team:${team.id}`).emit('team:state', {
+      ...teamState
+    })
+  }
 }
 
 function computeWinners(roundId) {
@@ -549,6 +557,23 @@ io.on('connection', (socket) => {
     socket.join(`team:${team.id}`)
     socket.emit('team:state', {
       token,
+      ...teamStateFor(team)
+    })
+  })
+
+  // Team subscribe - allows teams to request subscription to broadcast updates
+  socket.on('team:subscribe', ({ token }) => {
+    if (!token) {
+      socket.emit('error:team', 'Missing token')
+      return
+    }
+    const team = db.prepare('SELECT * FROM teams WHERE token = ?').get(token)
+    if (!team) {
+      socket.emit('error:team', 'Unknown team session')
+      return
+    }
+    socket.join(`team:${team.id}`)
+    socket.emit('team:state', {
       ...teamStateFor(team)
     })
   })

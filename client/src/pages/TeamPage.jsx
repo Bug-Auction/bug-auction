@@ -51,6 +51,8 @@ export default function TeamPage() {
       setStatus('Connected')
       if (token) {
         s.emit('team:reconnect', { token })
+        // Subscribe to team broadcast updates
+        s.emit('team:subscribe', { token })
       }
     }
 
